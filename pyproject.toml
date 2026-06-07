@@ -1,0 +1,14 @@
+[project]
+name = "ingestion-demo"
+version = "0.1.0"
+description = "Demo of the v5 ingestion pipeline (discovery → extraction → redaction → chunking)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "docling>=2.0",
+    "transformers>=4.40",
+    "tree-sitter>=0.23",
+    "tree-sitter-language-pack>=0.7",
+]
+
+[tool.uv]
+# Demo only; not the air-gapped bundle described in §10.

@@ -1,0 +1,10 @@
+Service Restart Runbook
+
+When the ingest worker hangs, follow these steps to restart it safely.
+
+1. Drain the queue by setting the worker to maintenance mode.
+2. Send SIGTERM and wait 30 seconds for a graceful shutdown.
+3. If the process is still alive, send SIGKILL.
+4. Start the worker and confirm it picks up the queue again.
+
+Note: never SIGKILL without draining first, or in-flight messages are lost.
