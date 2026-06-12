@@ -1,0 +1,31 @@
+incidents:
+  - title: "Port already in use — stale process holding the listener"
+    steps_md: |
+      1. Identify the process holding the port: `lsof -i :<port>` (or `netstat -ano | findstr <port>` on Windows).
+      2. If it is a stale instance of the same service, stop it gracefully: `systemctl stop <service>` or `kill <pid>`.
+      3. If the port is legitimately taken, change the service port in the config file and restart.
+      4. Verify the listener: `ss -ltnp | grep <port>`.
+    symptom_logs: |
+      2026-01-14T09:12:33.412Z ERROR server failed to start: port 4000 busy!
+      2026-01-14T09:12:33.413Z ERROR bind: address already in use 0.0.0.0:4000
+
+  - title: "Missing application config file"
+    steps_md: |
+      1. Confirm the expected config path printed in the error.
+      2. Copy the template: `cp config.example.yaml config.yaml` into the project root.
+      3. Fill in required keys (`db_url`, `port`, `api_key`); validate with `app validate-config`.
+      4. Restart the service and confirm a clean startup log.
+    symptom_logs: |
+      2026-01-14T09:12:34.001Z ERROR config missing at /users/foo/project/config.yaml
+      2026-01-14T09:12:34.002Z WARN  falling back to defaults; startup aborted
+
+  - title: "Database connection refused — Postgres down or wrong host"
+    steps_md: |
+      1. Check that Postgres is running: `pg_isready -h <host> -p <port>`.
+      2. If down, start it: `systemctl start postgresql` (or `docker compose up db`).
+      3. If running, verify `DATABASE_URL` host/port match the server's `listen_addresses`.
+      4. Check `pg_hba.conf` allows the client subnet; reload with `SELECT pg_reload_conf();`.
+    symptom_logs: |
+      2026-01-14T10:02:11.900Z ERROR could not connect to database at 10.0.0.5:5432: connection refused
+      2026-01-14T10:02:12.142Z ERROR psycopg.OperationalError: connection failed
+          at Pool._acquire (pool.py:212)

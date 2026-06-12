@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: log2poa
+      POSTGRES_PASSWORD: log2poa
+      POSTGRES_DB: log2poa
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U log2poa"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://log2poa:log2poa@db:5432/log2poa
+      FUZZY_THRESHOLD: "0.60"
+      ABSTAIN_THRESHOLD: "0.45"
+      # ANTHROPIC_API_KEY: sk-ant-...   # uncomment to enable LLM presentation
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

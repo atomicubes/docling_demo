@@ -1,0 +1,7 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+psycopg[binary,pool]>=3.2
+pydantic>=2.7
+python-multipart>=0.0.9
+PyYAML>=6.0
+anthropic>=0.40  # optional LLM presentation layer
